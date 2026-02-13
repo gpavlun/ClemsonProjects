@@ -1,0 +1,210 @@
+This document is a performance evaluation for MP6
+
+Random addressing for retrieve driver with linear probing. The supporting data is shown
+below, but to summarize;
+My code performed close to the formula across the board, but the trend breaks down a
+bit at either end of the spectrum. My code outperformed the formulas at small load factors,
+but at higher load factors it began to underperform. This is possibly due to the computer
+not being able to generate true random numbers, or it could be that the formula uses the
+load factor as a constant, when it is more likely to be an exponential.
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.5)
+    The average number of probes for a successful search = 1.01953
+    Avg probes for unsuccessful search = 1.47551 measured with 49999 trials
+--- Linear probe sequence performance formulas ---
+    Expected probes for successful search 1.5
+    Expected probes for unsuccessful search 2.5
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.75)
+    The average number of probes for a successful search = 3.01717
+    Avg probes for unsuccessful search = 7.47643 measured with 49999 trials
+--- Linear probe sequence performance formulas ---
+    Expected probes for successful search 2.5
+    Expected probes for unsuccessful search 8.5
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.9)
+    The average number of probes for a successful search = 9.0326
+    Avg probes for unsuccessful search = 48.314 measured with 49998 trials
+--- Linear probe sequence performance formulas ---
+    Expected probes for successful search 5.5
+    Expected probes for unsuccessful search 50.5
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.95)
+    The average number of probes for a successful search = 19.2266
+    Avg probes for unsuccessful search = 231.177 measured with 49998 trials
+--- Linear probe sequence performance formulas ---
+    Expected probes for successful search 10.5
+    Expected probes for unsuccessful search 200.5
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.99)
+    The average number of probes for a successful search = 112.068
+    Avg probes for unsuccessful search = 8276.75 measured with 49997 trials
+--- Linear probe sequence performance formulas ---
+    Expected probes for successful search 50.5
+    Expected probes for unsuccessful search 5000.5
+
+
+
+Random addressing for retrieve driver with double hashing. The supporting data is shown 
+below, but to summarize;
+The data from this method was much closer to what was expected across the board.
+The code outperformed the formulas in all early cases, but as the load factor
+increased, the time for a successful search began to slow down, until it was ovetaken
+by the formulas estimation, but it was still very close, enough to which I would argue
+it is due to statistical averages not being perfect.
+
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.5)
+    The average number of probes for a successful search = 0.77887
+    Avg probes for unsuccessful search = 0.98354 measured with 49999 trials
+--- Double hashing performance formulas ---
+    Expected probes for successful search 1.38629
+    Expected probes for unsuccessful search 2
+
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.75)
+    The average number of probes for a successful search = 1.71244
+    Avg probes for unsuccessful search = 2.99672 measured with 49999 trials
+--- Double hashing performance formulas ---
+    Expected probes for successful search 1.84839
+    Expected probes for unsuccessful search 4
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.9)
+    The average number of probes for a successful search = 3.12727
+    Avg probes for unsuccessful search = 9.03496 measured with 49998 trials
+--- Double hashing performance formulas ---
+    Expected probes for successful search 2.55843
+    Expected probes for unsuccessful search 10
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.95)
+    The average number of probes for a successful search = 4.34536
+    Avg probes for unsuccessful search = 18.9946 measured with 49998 trials
+--- Double hashing performance formulas ---
+    Expected probes for successful search 3.1534
+    Expected probes for unsuccessful search 20
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.99)
+    The average number of probes for a successful search = 7.35004
+    Avg probes for unsuccessful search = 98.9815 measured with 49997 trials
+--- Double hashing performance formulas ---
+    Expected probes for successful search 4.65169
+    Expected probes for unsuccessful search 100
+
+
+
+Random addressing for retrieve driver with seperate chaining. The supporting data is shown 
+below, but to summarize;
+This was by far the best performing algorithm, despite conceptually not seeming to be.
+I would have assumed initailly that the linear search at each node would produce bad
+search times, but in general it worked very effectively. Not only that, it was also
+much easier to implement, in my opinion, and had far less edge cases to worry about.
+The code performed worse in all cases with unsuccessful searches, but performed better
+in all successful cases. This may be due to my own failure to implement the probing
+correctly, but I would argue that this is due to my implementation that keeps all the
+nodes initialized and cleans each linked list to never have empty spaces after a 
+deletion.
+
+
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.5)
+    The average number of probes for a successful search = 0.256805
+    Avg probes for unsuccessful search = 1.1082 measured with 49999 trials
+--- Separate chaining performance formulas ---
+    Expected probes for successful search 1.25
+    Expected probes for unsuccessful search 0.5
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.75)
+    The average number of probes for a successful search = 0.380432
+    Avg probes for unsuccessful search = 1.22204 measured with 49999 trials
+--- Separate chaining performance formulas ---
+    Expected probes for successful search 1.375
+    Expected probes for unsuccessful search 0.75
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.9)
+    The average number of probes for a successful search = 0.454334
+    Avg probes for unsuccessful search = 1.30753 measured with 49998 trials
+--- Separate chaining performance formulas ---
+    Expected probes for successful search 1.45
+    Expected probes for unsuccessful search 0.9
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.95)
+  Trials: 50000
+  Build table with 62260 random keys
+    The average number of probes for a successful search = 0.478943
+    Avg probes for unsuccessful search = 1.33797 measured with 49998 trials
+--- Separate chaining performance formulas ---
+    Expected probes for successful search 1.475
+    Expected probes for unsuccessful search 0.95
+
+----- Retrieve driver -----
+Table size (65537), load factor (0.99)
+    The average number of probes for a successful search = 0.497834
+    Avg probes for unsuccessful search = 1.36362 measured with 49997 trials
+--- Separate chaining performance formulas ---
+    Expected probes for successful search 1.495
+    Expected probes for unsuccessful search 0.99
+
+
+
+This section will analyze primary clustering of each method with random v.s. sequencial 
+addresses. As always, data is list below, but a summary is provided here;
+The performance for seperate chaining is pretty much the same across the board, no notable
+difference with it, which is to be expected given it isn't really succeptable to random
+values. The double hashing protocol had a slight dip in performance from random to sequential,
+but overall seemed fairly similar. Linear probing, however, was absolutely nuked by this.
+The average probes went from 5 to 4000 in the case of successful searchs. Absolutely terrible.
+
+
+
+RANDOMS:
+
+Separate chaining
+    The average number of probes for a successful search = 0.428751
+    Avg probes for unsuccessful search = 1.27803 measured with 49998 trials
+--- Separate chaining performance formulas ---
+    Expected probes for successful search 1.425
+    Expected probes for unsuccessful search 0.85
+
+Open addressing with double hashing
+    The average number of probes for a successful search = 2.47941
+    Avg probes for unsuccessful search = 5.68703 measured with 49998 trials
+--- Double hashing performance formulas ---
+    Expected probes for successful search 2.23191
+    Expected probes for unsuccessful search 6.66667
+
+Open addressing with linear probe sequence
+    The average number of probes for a successful search = 5.61408
+    Avg probes for unsuccessful search = 22.0371 measured with 49998 trials
+--- Linear probe sequence performance formulas ---
+    Expected probes for successful search 3.83333
+    Expected probes for unsuccessful search 22.7222
+
+SEQUENTILS:
+
+Separate chaining
+    The average number of probes for a successful search = 0.317134
+    Avg probes for unsuccessful search = 1.29636 measured with 50000 trials
+
+Open addressing with double hashing
+    The average number of probes for a successful search = 3.07759
+    Avg probes for unsuccessful search = 5.64056 measured with 50000 trials
+
+Open addressing with linear probe sequence
+    The average number of probes for a successful search = 4137.37
+    Avg probes for unsuccessful search = 10958.7 measured with 50000 trials
+
+

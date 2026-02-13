@@ -1,0 +1,665 @@
+**The following is a testplan for a hashtable using linear probing with a size of 10.
+The data here demonstrates that it can insert, delete, and rehash with no issues. 
+The table will not insert when it is full and it will not delete when it is empty.
+It will insert into deleted positons so long as it does not need to replace a preexisting
+key. One key will always be empty in the table. The prints are self explanitory, but I 
+will add some annotations regardless, denoted with a double star (**)
+
+
+
+
+
+building table of type 0 with size 10
+Table[0] = EMPTY
+Table[1] = EMPTY
+Table[2] = EMPTY
+Table[3] = EMPTY
+Table[4] = EMPTY
+Table[5] = EMPTY
+Table[6] = EMPTY
+Table[7] = EMPTY
+Table[8] = EMPTY
+Table[9] = EMPTY
+--all empty
+
+attempting to insert in every position
+	key a inserted, starting at 7
+	key b inserted, starting at 8
+	key c inserted, starting at 9
+	key d inserted, starting at 0
+	key e inserted, starting at 1
+	key f inserted, starting at 2
+	key g inserted, starting at 3
+	key h inserted, starting at 4
+	key i inserted, starting at 5
+	key j did not insert    **key j does not insert due to table having only one empty spot and therefore being full
+table is full
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = g
+Table[4] = h
+Table[5] = i
+Table[6] = EMPTY
+Table[7] = a
+Table[8] = b
+Table[9] = c
+--allowed all but one to insert
+
+deleting one item
+	key g removed
+table has one deleted item
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = DELETED
+Table[4] = h
+Table[5] = i
+Table[6] = EMPTY
+Table[7] = a
+Table[8] = b
+Table[9] = c
+attempt to insert item already in table
+	key h updated
+table with updated key
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = DELETED
+Table[4] = h
+Table[5] = i
+Table[6] = EMPTY
+Table[7] = a
+Table[8] = b
+Table[9] = c
+attempt to insert item in table
+	key k inserted, starting at 7
+table with k inserted
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = DELETED
+Table[4] = h
+Table[5] = i
+Table[6] = k    **key "k" starts at position 7 and deincrements until it finds the next open position, 
+Table[7] = a      this is how collisions are handled in linear probing. If it reached the end of the
+Table[8] = b      table, it will loop back to the top. This can be seen in cases where the deletions fails,
+Table[9] = c      as it has to loop through  the entire list to find the item, or until it finds an empty key
+--only one empty spot, deleted
+
+delete three items
+	key a removed
+	key b removed
+	key c removed
+table after deletions
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = DELETED
+Table[4] = h
+Table[5] = i
+Table[6] = k
+Table[7] = DELETED
+Table[8] = DELETED
+Table[9] = DELETED
+--table with 4 deleted spots
+
+rehashing table to size 22
+table after rehash
+Table[0] = EMPTY
+Table[1] = EMPTY
+Table[2] = EMPTY
+Table[3] = EMPTY
+Table[4] = EMPTY
+Table[5] = EMPTY
+Table[6] = EMPTY
+Table[7] = EMPTY
+Table[8] = EMPTY
+Table[9] = EMPTY
+Table[10] = EMPTY
+Table[11] = EMPTY
+Table[12] = d
+Table[13] = e
+Table[14] = f
+Table[15] = EMPTY
+Table[16] = h
+Table[17] = i
+Table[18] = EMPTY
+Table[19] = k
+Table[20] = EMPTY
+Table[21] = EMPTY
+--no deleteds remain
+
+rehash to a size of 6
+table after rehashing
+Table[0] = f
+Table[1] = EMPTY
+Table[2] = h
+Table[3] = i
+Table[4] = d
+Table[5] = e
+--key k was not able to be reinserted
+
+attmept delete 10 items
+	key a not in table
+	key b not in table
+	key c not in table
+	key d removed
+	key e removed
+	key f removed
+	key g not in table
+	key h removed
+	key i removed
+	key j not in table
+table after deletions
+Table[0] = DELETED
+Table[1] = EMPTY
+Table[2] = DELETED
+Table[3] = DELETED
+Table[4] = DELETED
+Table[5] = DELETED
+--no more items in table
+--did not try to delete items that didn't exist
+
+
+
+
+
+**This section is about double hashing, which will be very similar to linear
+probing, but the deincrement will be different. In this case, the table 
+will deincrement by a hashed value from the initial starting point, instead
+of by one. This may lead to an event where the table is not able to visit
+every position in the table, in that case, it will terminate that attempt
+when it detects and infinite loop. This is determined if the current position
+ever loops back to itself, as this would mean that the deincrement in a multiple
+of the table size.
+
+
+
+
+
+building table of type 1 with size 10
+Table[0] = EMPTY
+Table[1] = EMPTY
+Table[2] = EMPTY
+Table[3] = EMPTY
+Table[4] = EMPTY
+Table[5] = EMPTY
+Table[6] = EMPTY
+Table[7] = EMPTY
+Table[8] = EMPTY
+Table[9] = EMPTY
+--all empty
+
+attempting to insert in every position
+	key a inserted, starting at 7
+	key b inserted, starting at 8
+	key c inserted, starting at 9
+	key d inserted, starting at 0
+	key e inserted, starting at 1
+	key f inserted, starting at 2
+	key g inserted, starting at 3
+	key h inserted, starting at 4
+	key i inserted, starting at 5
+	key j did not insert
+table is full
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = g
+Table[4] = h
+Table[5] = i
+Table[6] = EMPTY
+Table[7] = a
+Table[8] = b
+Table[9] = c
+--allowed all but one to insert
+
+deleting one item
+	key g removed
+table has one deleted item
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = DELETED
+Table[4] = h
+Table[5] = i
+Table[6] = EMPTY
+Table[7] = a
+Table[8] = b
+Table[9] = c
+attempt to insert item already in table
+	key h updated
+table with updated key
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = DELETED
+Table[4] = h
+Table[5] = i
+Table[6] = EMPTY
+Table[7] = a    **different to the linear probing, we can see that when k was inserted, instead of incrementing
+Table[8] = b      down by one, it incremented down by some other value, probably two, and then ended up in the 
+Table[9] = c      deleted spot instead of the empty one
+attempt to insert item in table
+	key k inserted, starting at 7
+table with k inserted
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = k
+Table[4] = h
+Table[5] = i
+Table[6] = EMPTY
+Table[7] = a
+Table[8] = b
+Table[9] = c
+--only one empty spot
+
+delete three items
+	key a removed
+	key b removed
+	key c removed
+table after deletions
+Table[0] = d
+Table[1] = e
+Table[2] = f
+Table[3] = k
+Table[4] = h
+Table[5] = i
+Table[6] = EMPTY
+Table[7] = DELETED
+Table[8] = DELETED
+Table[9] = DELETED
+--table with 3 deleted spots and one empty
+
+rehashing table to size 22
+table after rehash
+Table[0] = EMPTY
+Table[1] = EMPTY
+Table[2] = EMPTY
+Table[3] = EMPTY
+Table[4] = EMPTY
+Table[5] = EMPTY
+Table[6] = EMPTY
+Table[7] = EMPTY
+Table[8] = EMPTY
+Table[9] = EMPTY
+Table[10] = EMPTY
+Table[11] = EMPTY
+Table[12] = d
+Table[13] = e
+Table[14] = f
+Table[15] = EMPTY
+Table[16] = h
+Table[17] = i
+Table[18] = EMPTY
+Table[19] = k
+Table[20] = EMPTY
+Table[21] = EMPTY
+--no deleteds remain
+
+rehash to a size of 6
+table after rehashing
+Table[0] = f
+Table[1] = EMPTY
+Table[2] = h
+Table[3] = i
+Table[4] = d
+Table[5] = e
+--key k was not able to be reinserted
+
+attmept delete 10 items
+	key a not in table
+	key b not in table
+	key c not in table
+	key d removed
+	key e removed
+	key f removed
+	key g not in table
+	key h removed
+	key i removed
+	key j not in table
+table after deletions
+Table[0] = DELETED
+Table[1] = EMPTY
+Table[2] = DELETED
+Table[3] = DELETED
+Table[4] = DELETED
+Table[5] = DELETED
+--no more items in table
+--did not try to delete items that didn't exist
+
+
+
+
+
+**This last section is with regards to seperate chaining. The table created
+is a 10 element table which will never be returned as full. The elements
+are chained together at each index, essentially creating a linked list at
+each position. The table does not have as many edge cases or issues due to
+its inability to be full and not having to deal with odd increments. This
+does, however, result in some slower search times for poor hashfunctions.
+
+
+
+
+
+attempting to insert in every position
+	key a inserted, starting at 7
+	key b inserted, starting at 8
+	key c inserted, starting at 9
+	key d inserted, starting at 0
+	key e inserted, starting at 1
+	key f inserted, starting at 2
+	key g inserted, starting at 3
+	key h inserted, starting at 4
+	key i inserted, starting at 5
+	key j inserted, starting at 6
+table is not full
+Table[0][0] = d, 
+Table[1][0] = e, 
+Table[2][0] = f, 
+Table[3][0] = g, 
+Table[4][0] = h, 
+Table[5][0] = i,    **as we can see, all elements of the table are
+Table[6][0] = j,      occupied, but the table is not considered full
+Table[7][0] = a, 
+Table[8][0] = b, 
+Table[9][0] = c, 
+--allowed all to insert
+
+deleting one item
+	key g removed
+table has one deleted item
+Table[0][0] = d, 
+Table[1][0] = e, 
+Table[2][0] = f, 
+Table[3][0] = EMPTY,    **when an item is deleted, it is just marked
+Table[4][0] = h,          as empty
+Table[5][0] = i,
+Table[6][0] = j, 
+Table[7][0] = a, 
+Table[8][0] = b, 
+Table[9][0] = c, 
+attempt to insert item already in table
+	key h updated, starting at 4
+
+table with updated key
+Table[0][0] = d, 
+Table[1][0] = e, 
+Table[2][0] = f, 
+Table[3][0] = EMPTY, 
+Table[4][0] = h,    *updated item does not multiply
+Table[5][0] = i, 
+Table[6][0] = j, 
+Table[7][0] = a, 
+Table[8][0] = b, 
+Table[9][0] = c, 
+attempt to insert item in table
+	key k inserted, starting at 7
+table with k inserted
+Table[0][0] = d, 
+Table[1][0] = e, 
+Table[2][0] = f, 
+Table[3][0] = EMPTY, 
+Table[4][0] = h, 
+Table[5][0] = i, 
+Table[6][0] = j, 
+Table[7][0] = a, Table[7][1] = k,   **elements inserted into the same
+Table[8][0] = b,                      position are chained
+Table[9][0] = c, 
+--only one empty spot
+
+delete three items
+	key a removed
+	key b removed
+	key c removed
+table after deletions
+Table[0][0] = d, 
+Table[1][0] = e, 
+Table[2][0] = f, 
+Table[3][0] = EMPTY, 
+Table[4][0] = h, 
+Table[5][0] = i, 
+Table[6][0] = j, 
+Table[7][0] = k,    **since a was in a chain with k, that position
+Table[8][0] = EMPTY,  remains occupied after a is removed
+Table[9][0] = EMPTY, 
+--table with 3 empty spots
+
+rehashing table to size 22
+table after rehash
+Table[0][0] = EMPTY, 
+Table[1][0] = EMPTY, 
+Table[2][0] = EMPTY, 
+Table[3][0] = EMPTY, 
+Table[4][0] = EMPTY, 
+Table[5][0] = EMPTY, 
+Table[6][0] = EMPTY, 
+Table[7][0] = EMPTY, 
+Table[8][0] = EMPTY, 
+Table[9][0] = EMPTY, 
+Table[10][0] = EMPTY, 
+Table[11][0] = EMPTY, 
+Table[12][0] = d, 
+Table[13][0] = e, 
+Table[14][0] = f, 
+Table[15][0] = EMPTY, 
+Table[16][0] = h, 
+Table[17][0] = i, 
+Table[18][0] = j, 
+Table[19][0] = k, 
+Table[20][0] = EMPTY, 
+Table[21][0] = EMPTY, 
+--all elements intact
+
+rehash to a size of 6
+table after rehashing
+Table[0][0] = f, 
+Table[1][0] = EMPTY, 
+Table[2][0] = h, 
+Table[3][0] = i, 
+Table[4][0] = d, Table[4][1] = j,   **a bonus here, rehashing to a small size
+Table[5][0] = e, Table[5][1] = k,     will never lose items
+--all keys able to be reinserted
+
+attmept delete 10 items
+	key a not in table
+	key b not in table
+	key c not in table
+	key d removed
+	key e removed
+	key f removed
+	key g not in table
+	key h removed
+	key i removed
+	key j removed
+table after deletions
+Table[0][0] = EMPTY, 
+Table[1][0] = EMPTY, 
+Table[2][0] = EMPTY, 
+Table[3][0] = EMPTY, 
+Table[4][0] = EMPTY, 
+Table[5][0] = k, 
+--only k remains
+--did not try to delete items that didn't exist
+
+
+
+
+
+**Notes on weird occurances. If the table increment loops
+through the entire table without hitting every position,
+it may result that is unable to find a spot, which will
+then result in an infinite loop. The situation in which
+this happens is below
+
+
+
+
+
+building table of type 1 with size 4
+increment 4
+attempt to insert item in table
+	key k inserted, starting at 3, increment 4	
+Table[0] = EMPTY
+Table[1] = EMPTY
+Table[2] = EMPTY
+Table[3] = k
+increment 4						**as we can see, the increment is the same size as the table
+attempt to insert item in table	  which means it will never actually go anywhere. In this case
+	key c did not insert		  the program will simply stop trying. This was done with a custom
+Table[0] = EMPTY				  double hash function that just returns the size of the table, so
+Table[1] = EMPTY				  this specific case will not occur if you try to recreate it, but
+Table[2] = EMPTY				  it still demonstrates how the issue is handled.
+Table[3] = k
+
+
+
+
+
+**Finally here is some valgrind prints to show
+that there are no memory leaks.
+
+
+
+
+
+huskarl@Hlidskjalf:~/Documents/Classes/31 Junior Fall/Data Structures/Unit 6/mp6-hash-gpavlun$ valgrind ./lab6 -e
+==4130705== Memcheck, a memory error detector
+==4130705== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==4130705== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==4130705== Command: ./lab6 -e
+==4130705== 
+Open addressing with linear probe sequence
+Using hash algorithm djb_hash
+Seed: 12012025
+
+----- Equilibrium test driver -----
+Table size (11), load factor (0.9)
+  Trials: 50000
+  Build table with 9 random keys
+    The average number of probes for a successful search = 1.55556
+  Keys added (23540), removed (23541) new size should be (8) and is (8)
+  After exercise, time=174.821 
+  successful searches during exercise=1.24472, trials=23541
+  unsuccessful searches during exercise=12.244, trials=23540
+  After retrieve experiment, time=198.857
+  New load factor = 0.727273
+  Percent empty locations marked deleted = 100
+   Measured avg probes for successful search=1.25, trials=8
+   Measured avg probes for unsuccessful search=11, trials=50000
+
+	Run with table size at least 101 (-m 101).  Try -m 65537 and 655373
+
+Found 0 of the class keys. Did not find 40 that were removed
+  Rehash table
+After rehash, found 0 of the class keys. Did not find 40
+  After rehash, time=176.335
+   Measured avg probes for successful search=0.75, trials=8
+   Measured avg probes for unsuccessful search=3.51832, trials=50000
+----- End of equilibrium test -----
+
+==4130705== 
+==4130705== HEAP SUMMARY:
+==4130705==     in use at exit: 0 bytes in 0 blocks
+==4130705==   total heap usage: 147,104 allocs, 147,104 frees, 1,158,904 bytes allocated
+==4130705== 
+==4130705== All heap blocks were freed -- no leaks are possible
+==4130705== 
+==4130705== For lists of detected and suppressed errors, rerun with: -s
+==4130705== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+huskarl@Hlidskjalf:~/Documents/Classes/31 Junior Fall/Data Structures/Unit 6/mp6-hash-gpavlun$ valgrind ./lab6 -e -h chain
+==4130708== Memcheck, a memory error detector
+==4130708== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==4130708== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==4130708== Command: ./lab6 -e -h chain
+==4130708== 
+Separate chaining
+Using hash algorithm djb_hash
+Seed: 12012025
+
+----- Equilibrium test driver -----
+Table size (11), load factor (0.9)
+  Trials: 50000
+  Build table with 9 random keys
+    The average number of probes for a successful search = 0.111111
+  Keys added (25032), removed (24737) new size should be (304) and is (304)
+  After exercise, time=188.911 
+  successful searches during exercise=0, trials=24737
+  unsuccessful searches during exercise=20.2208, trials=25032
+  After retrieve experiment, time=267.199
+  New load factor = 27.6364
+  Percent empty locations marked deleted = -0
+   Measured avg probes for successful search=100.178, trials=304
+     ** This measure is biased.  See comments
+
+   Measured avg probes for unsuccessful search=42.294, trials=50000
+
+	Run with table size at least 101 (-m 101).  Try -m 65537 and 655373
+
+Found 0 of the class keys. Did not find 40 that were removed
+  Rehash table
+After rehash, found 0 of the class keys. Did not find 40
+  After rehash, time=268.212
+   Measured avg probes for successful search=100.178, trials=304
+   Measured avg probes for unsuccessful search=43.1319, trials=50000
+----- End of equilibrium test -----
+
+==4130708== 
+==4130708== HEAP SUMMARY:
+==4130708==     in use at exit: 0 bytes in 0 blocks
+==4130708==   total heap usage: 168,538 allocs, 168,538 frees, 1,767,169 bytes allocated
+==4130708== 
+==4130708== All heap blocks were freed -- no leaks are possible
+==4130708== 
+==4130708== For lists of detected and suppressed errors, rerun with: -s
+==4130708== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+huskarl@Hlidskjalf:~/Documents/Classes/31 Junior Fall/Data Structures/Unit 6/mp6-hash-gpavlun$ valgrind ./lab6 -e -h double
+==4130716== Memcheck, a memory error detector
+==4130716== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==4130716== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==4130716== Command: ./lab6 -e -h double
+==4130716== 
+Open addressing with double hashing
+Using hash algorithm djb_hash
+Seed: 12012025
+
+----- Equilibrium test driver -----
+Table size (11), load factor (0.9)
+  Trials: 50000
+  Build table with 9 random keys
+    The average number of probes for a successful search = 0.222222
+  Keys added (23451), removed (23458) new size should be (2) and is (2)
+  After exercise, time=199.56 
+  successful searches during exercise=1.14724, trials=23458
+  unsuccessful searches during exercise=12.1428, trials=23451
+  After retrieve experiment, time=212.334
+  New load factor = 0.181818
+  Percent empty locations marked deleted = 100
+   Measured avg probes for successful search=0.5, trials=2
+   Measured avg probes for unsuccessful search=11, trials=50000
+
+	Run with table size at least 101 (-m 101).  Try -m 65537 and 655373
+
+Found 0 of the class keys. Did not find 40 that were removed
+  Rehash table
+After rehash, found 0 of the class keys. Did not find 40
+  After rehash, time=179.861
+   Measured avg probes for successful search=0, trials=2
+   Measured avg probes for unsuccessful search=0.26778, trials=50000
+----- End of equilibrium test -----
+
+==4130716== 
+==4130716== HEAP SUMMARY:
+==4130716==     in use at exit: 0 bytes in 0 blocks
+==4130716==   total heap usage: 146,926 allocs, 146,926 frees, 1,157,499 bytes allocated
+==4130716== 
+==4130716== All heap blocks were freed -- no leaks are possible
+==4130716== 
+==4130716== For lists of detected and suppressed errors, rerun with: -s
+==4130716== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+
+

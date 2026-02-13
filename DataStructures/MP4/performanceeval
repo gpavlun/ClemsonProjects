@@ -1,0 +1,160 @@
+Performance evaluation for machine problem 4:
+
+	First Fit:
+	*coalesce disabled - took 3.18 seconds to run the driver with other settings default.
+			   - 46271 items in list after exercise
+			   - 47539 items in list after clean up
+	*coalesce enabled  - took 0.15 seconds to run with identical settings otherwise
+			   - 636 items in list
+			   - 2 items in list after clean up
+	*From this, it seems pretty clear that the coalescence is significantly 
+		better for speed performance and for fragmentation.
+	
+	Best Fit:
+	*coalesce disabled - took 1.07 seconds to run the driver with other settings default.
+			   - 7649 items in list after exercise
+			   - 8917 items in list after clean up
+	*coalesce enabled  - took 0.16 seconds to run with identical settings otherwise
+			   - 320 items in list
+			   - 2 items in list after clean up
+	*Here, we can see that the best fit policy results in half the amount of 
+		fragmentation that the first fit does, with only a .01 second 
+		time difference.
+	When assessing the first fit versus best fit policies, we can see that the fragmentation is much 
+worse in the first fit policy and the speed gained from using the first fit is very small. Coalescence 
+may take time to combine the units, but due to the roving point being placed on the coalesced block, 
+there is a good chance that the pointer will find the memory it needs in the list and not have to make 
+another call to the operating system. This vastly improves speed and would only slow down the algorithm 
+if very small memory calls were asked every time. I see virtually no downsides in using it. The best fit 
+is technically faster in the case where you are coalescing the memory, as the roving pointer is always on 
+the coalesced block, vastly increasing the chance that the pointer is starting on the desired block and 
+not having to search.
+	In regards to a two-way versus one-way implementation, I would say that in some edge cases, I was
+forced to loop my tailing pointer all the way around the list to grab certain blocks and if a block of
+new memory was added, I always had to loop all the way around to grab it. This would have been mitigated
+with a previous pointer built into the structure, but this would increase the amount of memory being used
+flatly across the board by increasing the unit size. This would also marginally increase the time it took
+to swap out different block and could lead to chain errors. Lastly, you would also need to be sure to 
+clear out the previous pointer in allocated blocks to prevent snooping from users. All in all, if I had 
+to do it again, I probably would have used a two-way list instead of the default one-way.
+	For the requested tests:
+	*[lab4 –e –w 10 –t 1000 –a 1024 –r 8]
+		Seed: 10272025
+		First-fit search policy without coalescing
+
+		Equilibrium test driver using Mem_alloc and Mem_free from mem.c
+		  Trials in equilibrium: 1000
+		  Warmup allocations: 10
+		  Average array size: 1024
+		  Range for average array size: 8
+		After warmup
+		  --- Free list stats ---
+			Count of items : 7
+			Memory in list : 24368 (bytes)
+				   avg : 4061 (bytes)
+				   min : 4048 (bytes)
+				   max : 4080 (bytes)
+			Calls to sbrk  : 10
+			Number of pages: 16
+		After exercise, time=1.42
+		  --- Free list stats ---
+			Count of items : 295
+			Memory in list : 626304 (bytes)
+				   avg : 2130 (bytes)
+				   min : 16 (bytes)
+				   max : 4144 (bytes)
+			Calls to sbrk  : 88
+			Number of pages: 171
+		After cleanup
+		  --- Free list stats ---
+			Count of items : 313
+			Memory in list : 700416 (bytes)
+				   avg : 2244 (bytes)
+				   min : 16 (bytes)
+				   max : 4144 (bytes)
+			Calls to sbrk  : 88
+			Number of pages: 171
+		  all memory is in the heap -- no leaks are possible
+		----- End of equilibrium test -----
+	*[lab4 -e -w 10 -t 1000 -a 4096 -r 8]
+		Seed: 10272025
+		First-fit search policy without coalescing
+
+		Equilibrium test driver using Mem_alloc and Mem_free from mem.c
+		  Trials in equilibrium: 1000
+		  Warmup allocations: 10
+		  Average array size: 4096
+		  Range for average array size: 8
+		After warmup
+		  --- Free list stats ---
+			Count of items : 7
+			Memory in list : 24368 (bytes)
+				   avg : 4061 (bytes)
+				   min : 4048 (bytes)
+				   max : 4080 (bytes)
+			Calls to sbrk  : 10
+			Number of pages: 46
+		After exercise, time=4.611
+		  --- Free list stats ---
+			Count of items : 296
+			Memory in list : 1506944 (bytes)
+				   avg : 5108 (bytes)
+				   min : 16 (bytes)
+				   max : 16432 (bytes)
+			Calls to sbrk  : 89
+			Number of pages: 440
+		After cleanup
+		  --- Free list stats ---
+			Count of items : 314
+			Memory in list : 1802240 (bytes)
+				   avg : 5757 (bytes)
+				   min : 16 (bytes)
+				   max : 16432 (bytes)
+			Calls to sbrk  : 89
+			Number of pages: 440
+		  all memory is in the heap -- no leaks are possible
+		----- End of equilibrium test -----
+	*[lab4 -e -a 124 -r 0]
+		Seed: 10272025
+		First-fit search policy without coalescing
+
+		Equilibrium test driver using Mem_alloc and Mem_free from mem.c
+		  Trials in equilibrium: 100000
+		  Warmup allocations: 1000
+		  Average array size: 124
+		  Range for average array size: 0
+		After warmup
+		  --- Free list stats ---
+			Count of items : 1
+			Memory in list : 0 (bytes)
+				   avg : 0 (bytes)
+				   min : -16 (bytes)
+				   max : 0 (bytes)
+			Calls to sbrk  : 125
+			Number of pages: 125
+		After exercise, time=74.761
+		  --- Free list stats ---
+			Count of items : 285
+			Memory in list : 145408 (bytes)
+				   avg : 512 (bytes)
+				   min : 512 (bytes)
+				   max : 512 (bytes)
+			Calls to sbrk  : 194
+			Number of pages: 194
+		After cleanup
+		  --- Free list stats ---
+			Count of items : 1553
+			Memory in list : 794624 (bytes)
+				   avg : 512 (bytes)
+				   min : 512 (bytes)
+				   max : 512 (bytes)
+			Calls to sbrk  : 194
+			Number of pages: 194
+		  all memory is in the heap -- no leaks are possible
+		----- End of equilibrium test -----
+	The minimum listed on any of these is never zero, as the dummy block is not included in the
+calculations. In cases where blocks are not all the same size, the minimum is lesser than the average and 
+the maximum is greater than the average.
+	When comparing to the C default function and using one-hundred thousand trials, my function with 
+best fit search policy and coalescing enabled, performed .049 seconds slower and given I used vastly few 
+bitwise operators than I wanted to, I think that is pretty good.
