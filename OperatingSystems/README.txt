@@ -1,5 +1,11 @@
 The creator of this garbage is Gregory Pavlunenko
 
+
+
+NOTICE: THIS SHIT DID NOT WORK VERY WELL
+
+
+
 PROJECT DESCRIPTION
 
 This project implements two simple Linux programs called sctracer and
