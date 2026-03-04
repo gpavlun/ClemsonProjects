@@ -1,0 +1,66 @@
+53 ?- plantassign(2, List).
+List = [roses, roses] ;
+List = [roses, petunias] ;
+List = [roses, daffodils] ;
+List = [roses, begonias] .
+
+54 ?- plantassign(3, List).
+List = [roses, roses, roses] ;
+List = [roses, roses, petunias] ;
+List = [roses, roses, daffodils] ;
+List = [roses, roses, begonias] .
+
+55 ?- uniquecheck([roses,roses]).
+false.
+
+56 ?- uniquecheck([roses,lilies]).
+true.
+
+57 ?- colorcheck([roses,tulips]).
+false.
+
+58 ?- colorcheck([roses,lilies]).
+true .
+
+59 ?- sizecheck([roses, lilies]).
+true.
+
+60 ?- sizecheck([zinnia,sunflower]).
+false.
+
+61 ?- wetcheck(4,List).
+List = [roses, petunias, petunias, roses] ;
+List = [roses, petunias, daffodils, roses] ;
+List = [roses, petunias, begonias, roses] ;
+List = [roses, petunias, marigolds, roses] .
+
+62 ?- wetcheck(5,List).
+List = [roses, petunias, _, petunias, roses] ;
+List = [roses, petunias, _, daffodils, roses] ;
+List = [roses, petunias, _, begonias, roses] ;
+List = [roses, petunias, _, marigolds, roses] .
+
+63 ?- writegarden([roses,roses,roses]).
+roses roses roses 
+true.
+
+64 ?- writegarden([roses,roses,lillies,roses]).
+roses roses lillies roses 
+true.
+
+65 ?- gardenplan(4, List).
+roses petunias daffodils snapdragons 
+List = [roses, petunias, daffodils, snapdragons] ;
+roses petunias daffodils lilies 
+List = [roses, petunias, daffodils, lilies] ;
+roses petunias daffodils azalea 
+List = [roses, petunias, daffodils, azalea] .
+
+66 ?- gardenplan(7, List).
+roses petunias daffodils begonias snapdragons bird_of_paradise azalea 
+List = [roses, petunias, daffodils, begonias, snapdragons, bird_of_paradise, azalea] ;
+roses petunias daffodils begonias snapdragons bird_of_paradise poppy 
+List = [roses, petunias, daffodils, begonias, snapdragons, bird_of_paradise, poppy] ;
+roses petunias daffodils begonias snapdragons bird_of_paradise crocus 
+List = [roses, petunias, daffodils, begonias, snapdragons, bird_of_paradise, crocus] .
+
