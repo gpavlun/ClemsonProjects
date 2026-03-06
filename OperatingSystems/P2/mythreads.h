@@ -36,13 +36,19 @@ extern void threadSignal(mutexlock_t* lock, condvar_t *cv);
 extern int interruptsAreDisabled;
 
 
-
+//my shit
+#define SET 0
+#define RUN 1
+#define FIN 2
 
 struct threadData{
+    char state;
+    char waiterState;
     int threadID;
     void *threadStack;
     ucontext_t *context;
-    unsigned char state; //0 = inactive
 };
 
 #define thData struct threadData
+
+int threadMain(void);

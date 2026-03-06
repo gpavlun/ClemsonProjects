@@ -1,11 +1,18 @@
 #include "linkedlist.h"
 #include "mythreads.h"
+#include "evil.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ucontext.h>
 #include <ucontext.h>
+#include <linux/types.h>
+#include <assert.h>
+#include <unistd.h>
 
 LLheader *threadList;
+LLheader *finishedList;
+int threadCount;
+//thData   *currentThread;
 
 /*──────────────────────────────────────┐
 │Function: threadInit                   │
@@ -20,21 +27,66 @@ LLheader *threadList;
 └──────────────────────────────────────*/
 void threadInit(void){
      
-    threadList = LLconstruct();
+    threadList   = LLconstruct();
+    finishedList = LLconstruct();
+    assert( NOT threadMain() );
+
+}
+
+
+
+int threadMain(void){ 
+    
+    int returnValue = -1;
+
+    IF( threadList )
+
+        /**/ /*========================================================*/ /**/
+        /**/ /*    allocate space for and create a thread structure    */ /**/
+        /**/ /*========================================================*/ /**/
+        /**/                                                              /**/
+        /**/    thData *thread = calloc(1, sizeof(thData));               /**/
+        /**/    thread->threadID = threadCount;                           /**/
+        /**/    threadCount++;                                            /**/
+        /**/                                                              /**/
+        /**/ /*========================================================*/ /**/
+
+
+
+        /**/ /*========================================================*/ /**/
+        /**/ /*         allocate space for and create a context        */ /**/
+        /**/ /*========================================================*/ /**/
+        /**/                                                              /**/
+        /**/    ucontext_t *context = calloc(1, sizeof(ucontext_t));      /**/
+        /**/    thread->context = context;                                /**/
+        /**/    getcontext(context);                                      /**/
+        /**/                                                              /**/
+        /**/ /*========================================================*/ /**/
+
+
+
+        /**/ /*========================================================*/ /**/
+        /**/ /*            add new thread to schedule list             */ /**/
+        /**/ /*========================================================*/ /**/
+        /**/                                                              /**/
+        /**/    LLappend(threadList, (void*)thread);                      /**/
+        /**/                                                              /**/
+        /**/ /*========================================================*/ /**/
+
+        returnValue = thread->threadID;
+
+    END
+
+    return returnValue;
 
 }
 
 //function wrapper
-void *funcWrapper(thData *thread, thFuncPtr funcPtr, void *argPtr){
+void funcWrapper(thData *thread, thFuncPtr funcPtr, void *argPtr){
 
-    thread->state = 1;
-    void *funcReturn = funcPtr(argPtr);
-    thread->state = 0;
-    return funcReturn;
+    threadExit( funcPtr(argPtr) );
 
 }
-
-
 
 
 /*──────────────────────────────────────┐
@@ -50,62 +102,107 @@ void *funcWrapper(thData *thread, thFuncPtr funcPtr, void *argPtr){
 └──────────────────────────────────────*/
 int threadCreate(thFuncPtr funcPtr, void *argPtr){ 
     
-    if(threadList){
-        thData *thread = (thData *)calloc(1, sizeof(thData));
-        thread->threadID = threadList->entrycount - 1;
+    int returnValue = -1;
 
-        ucontext_t *context = calloc(1, sizeof(ucontext_t));
-        thread->context = context;
-        getcontext(context);
+    IF( threadList )
         
-        thread->threadStack = calloc(1, STACK_SIZE);
-        context->uc_stack.ss_size = STACK_SIZE;
-        context->uc_stack.ss_sp = thread->threadStack;
+        /**/ /*========================================================*/ /**/
+        /**/ /*    allocate space for and create a thread structure    */ /**/
+        /**/ /*========================================================*/ /**/
+        /**/                                                              /**/
+        /**/    thData *thread = calloc(1, sizeof(thData));               /**/
+        /**/    thread->threadID = threadCount;                           /**/
+        /**/    threadCount++;                                            /**/
+        /**/                                                              /**/
+        /**/ /*========================================================*/ /**/
+
+
+
+        /**/ /*========================================================*/ /**/
+        /**/ /*         allocate space for and create a context        */ /**/
+        /**/ /*========================================================*/ /**/
+        /**/                                                              /**/
+        /**/    ucontext_t *context = calloc(1, sizeof(ucontext_t));      /**/
+        /**/    thread->context = context;                                /**/
+        /**/    getcontext(context);                                      /**/
+        /**/                                                              /**/
+        /**/ /*========================================================*/ /**/
+
+
+
+        /**/ /*========================================================*/ /**/
+        /**/ /*         allocate space for and create a new stack      */ /**/
+        /**/ /*========================================================*/ /**/
+        /**/                                                              /**/
+        /**/    thread->threadStack = calloc(1, STACK_SIZE);              /**/
+        /**/    context->uc_stack.ss_size = STACK_SIZE;                   /**/
+        /**/    context->uc_stack.ss_sp = thread->threadStack;            /**/
+        /**/                                                              /**/
+        /**/ /*========================================================*/ /**/
         
-        LLappend(threadList, (void*)thread);
+        
 
-        makecontext(context, funcWrapper, 3, &thread, funcPtr, argPtr);
+        /**/ /*========================================================*/ /**/
+        /**/ /*      add new thread to schedule list and start it      */ /**/
+        /**/ /*========================================================*/ /**/
+        /**/                                                              /**/
+        /**/    LLinsert( threadList, (void*)thread,                      /**/
+        /**/              0);                    /**/
+        /**/                                                              /**/
+        /**/    makecontext( context, (void(*)())(&funcWrapper),          /**/
+        /**/                 3, thread, funcPtr, argPtr );                /**/
+        /**/                                                              /**/
+        /**/    threadYield();                                            /**/
+        /**/                                                              /**/
+        /**/                                                              /**/
+        /**/ /*========================================================*/ /**/
 
-        return thread->threadID;
-    }else{
-        return -1;
-    }
-  
+        returnValue = thread->threadID;
+
+    END
+
+    return returnValue;
+
 }
 
-/*──────────────────────────────────────┐
-│Function: threadYield                  │
-├───────────────────────────────────────┤
-│Inputs: void                           │
-│Outputs: void                          │
-│                                       │
-│Purpose: This function will allow the  │
-│current thread to yield back the CPU   │
-│to the next mythreads                  │
-│                                       │
-└──────────────────────────────────────*/
+/*─────────────────────────────────────────────────────────────────────────────┐
+│ Function: threadYield                                                        │
+│                                                                              │
+│ Inputs: void                                                                 │
+│                                                                              │
+│ Outputs: void                                                                │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Purpose: This function will allow the                                        │
+│          current thread to yield back the CPU                                │
+│          to the next mythreads                                               │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────*/
 void threadYield(void){
-    static LLnode *currentThread;
-    
-    if(!currentThread){
-        currentThread = threadList->start;
-        if(!currentThread){
-            fprintf(stderr,"no thread active\n");
-            exit(1);
-        }
-    }
 
-    if(threadList->start-threadList->end){
-        ucontext_t currentContext = *((thData *)(currentThread->data))->context;
-        ucontext_t nextContext;
-        if(currentThread->next){
-            nextContext = *((thData *)(currentThread->next->data))->context;
-        }else{
-            nextContext = *((thData *)(threadList->start->data))->context;
-        }
+    thData *currentThread = (thData *)(threadList->end->data);
 
-        swapcontext(&currentContext, &nextContext);
-    }
+    assert( currentThread );
+
+    IF( threadList->start ISNT threadList->end )
+
+        currentThread->state = SET;
+        
+        thData *nextThread = (thData *)LLremove(threadList, 0);
+        nextThread->state = RUN;
+        
+        ucontext_t *currentContext = currentThread->context;
+        ucontext_t *nextContext    = nextThread->context;
+        
+        LLappend(threadList, (void *)nextThread);       //atomize
+        
+        swapcontext(currentContext, nextContext);
+
+    END
 }
 
 /*──────────────────────────────────────┐
@@ -119,7 +216,11 @@ void threadYield(void){
 │process.                               │
 │                                       │
 └──────────────────────────────────────*/
-void threadJoin(int thread_id, void **result) {}
+void threadJoin(int thread_id, void **result){
+
+    
+
+}
 
 /*──────────────────────────────────────┐
 │Function: threadExit                   │
@@ -133,7 +234,29 @@ void threadJoin(int thread_id, void **result) {}
 │the program.                           │
 │                                       │
 └──────────────────────────────────────*/
-void threadExit(void *result) {}
+void threadExit(void *result){
+
+    IF( NOT ((thData *)(threadList->end->data))->threadID )
+
+        exit(0);
+
+    ELSE
+
+        thData *currentThread;
+        currentThread = (thData *)LLremove( threadList, 
+                                            threadList->entrycount-1);
+        
+        currentThread->state = FIN;
+        LLappend(finishedList, (void *)currentThread); //atomize
+
+
+        thData *nextThread;
+        nextThread = (thData *)LLremove( threadList, 0 );
+        LLappend(threadList, nextThread);
+        swapcontext(currentThread->context, nextThread->context);
+
+    END
+}
 
 // mutex lock types and functions.
 struct mutexlock; // opaque type -- you need to implement this in your source
@@ -152,6 +275,3 @@ extern condvar_t *condvarCreate(void);
 extern void condvarDestroy(condvar_t *cv);
 extern void threadWait(mutexlock_t *lock, condvar_t *cv);
 extern void threadSignal(mutexlock_t *lock, condvar_t *cv);
-
-// this
-extern int interruptsAreDisabled;

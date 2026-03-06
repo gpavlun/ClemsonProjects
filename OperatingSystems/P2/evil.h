@@ -9,6 +9,7 @@
 #define IS ==
 #define ISNT !=
 #define NOT !
+#define NO !
 #define AND &&
 #define OR ||
 #define GREATER >
