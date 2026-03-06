@@ -1,4 +1,4 @@
-
+#include "linkedlist.h"
 #include <ucontext.h>
 
 #define STACK_SIZE (16*1024)  
@@ -46,9 +46,13 @@ struct threadData{
     char waiterState;
     int threadID;
     void *threadStack;
+    void *returnValue;
     ucontext_t *context;
 };
 
 #define thData struct threadData
+#define thPtr(A) ((thData *)(A))
 
 int threadMain(void);
+void ListDestruct(LLheader *Header);
+void threadDebrief(void);

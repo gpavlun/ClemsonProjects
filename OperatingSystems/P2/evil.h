@@ -5,7 +5,6 @@
 #define ELSE }else{
 #define ELIF(A) }else if(A){ 
 
-
 #define IS ==
 #define ISNT !=
 #define NOT !
@@ -15,9 +14,13 @@
 #define GREATER >
 #define LESS <
 
+
+
+
 #define SWITCH(A) switch(A){
 #define WHILE(A) while(A){
-#define FOR(B,A) for(B=0;B<A;B++){
+#define FOR(A,B,C) for(A=B;A<C;A++){
+
 
 #define END }
 
