@@ -16,24 +16,23 @@ int threadCount;
 
 /*─────────────────────────────────────────────────────────────────────────────┐
 │ Function: threadInit                                                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Parameters:                                                                  │
 │                                                                              │
-│ Inputs: void                                                                 │
+│   none                                                                       │
 │                                                                              │
-│ Outputs: void                                                                │
+│ Return:                                                                      │
+│                                                                              │
+│   none                                                                       │
 │                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Description:                                                                 │
 │                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
+│       This function initialized the threading library. It does this by       │
+│   creating two linked lists. The first one is a queue containing the         │
+│   currently running threads and the second one is a simple list of the       │
+│   finished threads in the program. It then creates a thread from main and    │
+│   adds it to the currently running list.                                     │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────*/
 void threadInit(void){
@@ -44,25 +43,22 @@ void threadInit(void){
 
 }
 /*─────────────────────────────────────────────────────────────────────────────┐
-│ Function: threadInit                                                         │
+│ Function: threadDebrief                                                      │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Parameters:                                                                  │
 │                                                                              │
-│ Inputs: void                                                                 │
+│   none                                                                       │
 │                                                                              │
-│ Outputs: void                                                                │
+│ Return:                                                                      │
+│                                                                              │
+│   none                                                                       │
 │                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Description:                                                                 │
 │                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
+│       This function is called when the main thread calls threadExit. It      │
+│   works by destructing the active thread list and the finished thread list,  │
+│   then using te exit system call to terminate the program.                   │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────*/
 void threadDebrief(void){
@@ -73,25 +69,23 @@ void threadDebrief(void){
 
 }
 /*─────────────────────────────────────────────────────────────────────────────┐
-│ Function: threadInit                                                         │
+│ Function: ListDestruct                                                       │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Parameters:                                                                  │
 │                                                                              │
-│ Inputs: void                                                                 │
+│   LLheader *Header, this the header of a linked list from linkedlist.h       │
 │                                                                              │
-│ Outputs: void                                                                │
+│ Outputs:                                                                     │
+│                                                                              │
+│   none                                                                       │
 │                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Description:                                                                 │
 │                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
+│       The LLdestruct function I wrote in linkedlist.h does not free the      │
+│   internally allocated structures in the thread data structure, so I         │
+│   created this function to handle clean up of the lists. Just has an         │
+│   additional step where it frees the context and the stack.                  │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────*/
 void ListDestruct(LLheader *Header){
@@ -165,11 +159,15 @@ void ListDestruct(LLheader *Header){
 
 
 /*─────────────────────────────────────────────────────────────────────────────┐
-│ Function: threadInit                                                         │
+│ Function: threadMain                                                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Parameters:                                                                  │
 │                                                                              │
-│ Inputs: void                                                                 │
+│   none                                                                       │
 │                                                                              │
-│ Outputs: void                                                                │
+│ Return:                                                                      │
+│                                                                              │
+│   int, main ID on success, -1 on failure                                     │
 │                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Description:                                                                 │
@@ -232,7 +230,27 @@ int threadMain(void){
 
 }
 
-//function wrapper
+/*─────────────────────────────────────────────────────────────────────────────┐
+│ Function: funcWrapper                                                        │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Parameters:                                                                  │
+│                                                                              │
+│   1. thData *thread, pointer to a thread data structure                      │
+│   1. thFuncPtr funcPtr, pointer to the thread function                       │
+│   2. void *argPtr, pointer the thread function argument                      │
+│                                                                              │
+│ Return:                                                                      │
+│                                                                              │
+│   none                                                                       │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Description:                                                                 │
+│                                                                              │
+│       This function serves a simple wrapper for thread functions. When the   │
+│   thread function returns, it calls threadExit on that thread to clean it    │
+│   up.                                                                        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────*/
 void funcWrapper(thData *thread, thFuncPtr funcPtr, void *argPtr){
 
     threadExit( funcPtr(argPtr) );
@@ -241,11 +259,16 @@ void funcWrapper(thData *thread, thFuncPtr funcPtr, void *argPtr){
 
 
 /*─────────────────────────────────────────────────────────────────────────────┐
-│ Function: threadInit                                                         │
+│ Function: threadCreate                                                       │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Parameters:                                                                  │
 │                                                                              │
-│ Inputs: void                                                                 │
+│   1. thFuncPtr funcPtr, pointer to the thread function                       │
+│   2. void *argPtr, pointer the thread function argument                      │
 │                                                                              │
-│ Outputs: void                                                                │
+│ Retrun:                                                                      │
+│                                                                              │
+│   int, thread ID on success, -1 on failure                                   │
 │                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Description:                                                                 │
@@ -329,24 +352,27 @@ int threadCreate(thFuncPtr funcPtr, void *argPtr){
 
 /*─────────────────────────────────────────────────────────────────────────────┐
 │ Function: threadYield                                                        │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Parameters:                                                                  │
 │                                                                              │
-│ Inputs: void                                                                 │
+│   none                                                                       │
 │                                                                              │
-│ Outputs: void                                                                │
+│ Outputs:                                                                     │
+│                                                                              │
+│   none                                                                       │
 │                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
-│ Description: This function is meant to be called by a currently running      │
-│              thread from my library, or by your main function, which is      │
-│              considered a thread for scheduling purposes. The implementation │
-│              is very simple, the code will dequeue the next node from the    │
-│              schedule queue and the reappend it at the end, switching to     │
-│              that node as it does so. This is done through a simple context  │
-│              switch at the end of the function. This function must certainly │
-│              be atomic, or have interrupts disabled, since it can cause      │
-│              severe harm or undefined behavior if there is a context switch  │
-│              that occurs during another switch.                              │
+│ Description:                                                                 │
 │                                                                              │
-│                                                                              │
+│       This function is meant to be called by a currently running thread from │
+│   my library, or by your main function, which is considered a thread for     │
+│   scheduling purposes. The implementation is very simple, the code will      │
+│   dequeue the next node from the schedule queue and the reappend it at the   │
+│   end, switching to that node as it does so. This is done through a simple   │
+│   context switch at the end of the function. This function must certainly be │
+│   atomic, or have interrupts disabled, since it can cause severe harm or     │
+│   undefined behavior if there is a context switch that occurs during another │
+│  switch.                                                                     │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────*/
 void threadYield(void){
@@ -377,11 +403,16 @@ void threadYield(void){
 }
 
 /*─────────────────────────────────────────────────────────────────────────────┐
-│ Function: threadInit                                                         │
+│ Function: threadJoin                                                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Parameters:                                                                  │
 │                                                                              │
-│ Inputs: void                                                                 │
+│   1. int thread_id, ID of the thread to wait on                              │
+│   2. void **result, pointer to the return pointer of the thread function     │
 │                                                                              │
-│ Outputs: void                                                                │
+│ Return                                                                       │
+│                                                                              │
+│   none                                                                       │
 │                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Description:                                                                 │
@@ -410,25 +441,27 @@ void threadJoin(int thread_id, void **result){
 }
 
 /*─────────────────────────────────────────────────────────────────────────────┐
-│ Function: threadInit                                                         │
+│ Function: threadExit                                                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ Inputs:                                                                      │
 │                                                                              │
-│ Inputs: void                                                                 │
+│   void *result, pointer to the return value of a thread function             │
 │                                                                              │
-│ Outputs: void                                                                │
+│ Outputs:                                                                     │
+│                                                                              │
+│   none                                                                       │
 │                                                                              │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │ Description:                                                                 │
 │                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
+│       This function allows a thread to rejoin the main thread, if the main   │
+│   thread calls this funciton, it will deconstruct the library and terminate  │
+│   the program. This function works by removing the currently running thread  │
+│   from the list of active threads, appending itself to the end of the list   │
+│   of finished threads, and then context swapping back to the next available  │
+│   thread in the schedule queue. If the ID number of the thread is zero, then │
+│   the function identifies the thread as main and calls the threadDebrief     │
+│   function, which breaks down the library and frees the memory.              │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────*/
 void threadExit(void *result){
